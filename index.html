@@ -1,0 +1,1745 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>诺诺小宝积分榜</title>
+    <style>
+        :root {
+            --color-pink: #FFD1DC;
+            --color-blue: #B5EAEA;
+            --color-green: #C9F4C9;
+            --color-yellow: #FFF6BF;
+            --color-purple: #E2D1F9;
+            --color-orange: #FFD8A7;
+            --shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Comic Sans MS', 'Marker Felt', '楷体', sans-serif;
+        }
+        
+        body {
+            margin: 0;
+            padding: 20px;
+            background-color: #f9f9f9;
+            background-image: radial-gradient(#ffc8dd 1px, transparent 2px);
+            background-size: 30px 30px;
+        }
+
+        h1, h2, h3 {
+            text-align: center;
+            color: #FF6B6B;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            background: linear-gradient(45deg, #FF6B6B, #FF9E6B);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            position: relative;
+            display: inline-block;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        h1::after {
+            content: "";
+            position: absolute;
+            bottom: -10px;
+            left: 0;
+            width: 100%;
+            height: 10px;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 10" width="20" height="10"><path d="M0,5 C5,0 15,10 20,5" stroke="%23FF6B6B" fill="transparent"/></svg>');
+            background-size: 20px 10px;
+            background-repeat: repeat-x;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .nav {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .nav-btn {
+            background-color: var(--color-pink);
+            border: none;
+            border-radius: 20px;
+            padding: 10px 20px;
+            margin: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            box-shadow: var(--shadow);
+            transition: all 0.3s;
+        }
+
+        .nav-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .nav-btn.active {
+            background-color: #FF6B6B;
+            color: white;
+        }
+
+        .page {
+            display: none;
+            padding: 20px;
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: var(--shadow);
+            margin-bottom: 20px;
+            border: 3px solid #FFD6FF;
+        }
+
+        .page.active {
+            display: block;
+            animation: fadeIn 0.5s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* 学生卡片布局 */
+        .students-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .student-card {
+            background-color: var(--color-blue);
+            border-radius: 15px;
+            padding: 15px;
+            box-shadow: var(--shadow);
+            position: relative;
+            transition: transform 0.3s;
+            border: 2px dashed #7B68EE;
+        }
+
+        .student-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .student-card h3 {
+            margin-top: 0;
+            color: #4A47A3;
+        }
+
+        .points {
+            font-size: 24px;
+            font-weight: bold;
+            color: #FF6B6B;
+            margin: 10px 0;
+            text-align: center;
+        }
+
+        .student-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-bottom: 10px;
+            justify-content: center;
+        }
+
+        .action-btn {
+            border: none;
+            border-radius: 10px;
+            padding: 5px 10px;
+            cursor: pointer;
+            font-size: 14px;
+            box-shadow: var(--shadow);
+            transition: all 0.2s;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .add-btn {
+            background-color: var(--color-green);
+        }
+
+        .subtract-btn {
+            background-color: var(--color-yellow);
+        }
+
+        .exchange-btn {
+            background-color: var(--color-purple);
+        }
+
+        .delete-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: #FF6B6B;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 25px;
+            height: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            line-height: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* 班级管理操作 */
+        .class-management {
+            text-align: center;
+            margin: 20px 0;
+            padding: 15px;
+            background-color: var(--color-orange);
+            border-radius: 15px;
+            box-shadow: var(--shadow);
+            border: 2px solid #FF9E6B;
+        }
+
+        .class-actions {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        /* 自定义行为设置 */
+        .behavior-categories {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .category {
+            background-color: var(--color-purple);
+            border-radius: 15px;
+            padding: 15px;
+            box-shadow: var(--shadow);
+            border: 2px solid #9370DB;
+        }
+
+        .category h3 {
+            color: #7B68EE;
+            background-color: white;
+            padding: 10px;
+            border-radius: 10px;
+            margin-top: 0;
+        }
+
+        .behavior-list {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .behavior-item {
+            background-color: white;
+            margin: 8px 0;
+            padding: 8px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-left: 4px solid #7B68EE;
+        }
+
+        .behavior-number {
+            background-color: #7B68EE;
+            color: white;
+            border-radius: 50%;
+            width: 25px;
+            height: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 10px;
+            flex-shrink: 0;
+        }
+
+        .behavior-description {
+            flex-grow: 1;
+            margin-right: 10px;
+        }
+
+        .behavior-points {
+            font-weight: bold;
+            color: #FF6B6B;
+            margin-right: 10px;
+        }
+
+        /* 兑换奖品管理 */
+        .rewards-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .reward-item {
+            background-color: var(--color-green);
+            border-radius: 15px;
+            padding: 15px;
+            box-shadow: var(--shadow);
+            text-align: center;
+            border: 2px solid #77DD77;
+        }
+
+        .reward-cost {
+            font-weight: bold;
+            color: #FF6B6B;
+        }
+
+        /* 积分日志 */
+        .log-filters {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 15px;
+            justify-content: center;
+        }
+
+        .log-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 15px;
+        }
+
+        .log-table th, .log-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        .log-table th {
+            background-color: var(--color-blue);
+            cursor: pointer;
+            position: relative;
+        }
+
+        .log-table th::after {
+            content: "↕";
+            position: absolute;
+            right: 8px;
+            opacity: 0.5;
+        }
+
+        .log-table tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        .log-summary {
+            background-color: var(--color-yellow);
+            padding: 10px;
+            border-radius: 10px;
+            margin-top: 15px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        /* 行为搜索 */
+        .behavior-search-container {
+            margin: 10px 0;
+            position: relative;
+        }
+
+        .behavior-search {
+            width: 100%;
+            padding: 8px 15px;
+            border: 2px solid #B5EAEA;
+            border-radius: 20px;
+            font-size: 14px;
+        }
+
+        .search-results {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 0 0 5px 5px;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 10;
+            display: none;
+        }
+
+        .search-result-item {
+            padding: 8px 15px;
+            cursor: pointer;
+            border-bottom: 1px solid #eee;
+        }
+
+        .search-result-item:hover {
+            background-color: #f0f0f0;
+        }
+
+        /* 模态框 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: var(--shadow);
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            border: 3px solid #FFD6FF;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #FFD6FF;
+            padding-bottom: 10px;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #FF6B6B;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #4A47A3;
+        }
+
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #B5EAEA;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        /* 响应式调整 */
+        @media (max-width: 768px) {
+            .students-grid, .behavior-categories, .rewards-list {
+                grid-template-columns: 1fr;
+            }
+            
+            .class-actions {
+                flex-direction: column;
+            }
+            
+            h1 {
+                font-size: 1.8rem;
+            }
+        }
+
+        .ribbon {
+            background: linear-gradient(45deg, #FF6B6B, #FF9E6B);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 0 15px 15px 0;
+            position: relative;
+            display: inline-block;
+            margin-bottom: 20px;
+            box-shadow: 3px 3px 5px rgba(0,0,0,0.2);
+        }
+
+        .ribbon::after {
+            content: "";
+            position: absolute;
+            top: 100%;
+            left: 0;
+            border-style: solid;
+            border-width: 0 10px 10px 0;
+            border-color: transparent #c23b3b transparent transparent;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🌈 诺诺小宝积分榜 🌈</h1>
+        
+        <!-- 导航栏 -->
+        <div class="nav">
+            <button class="nav-btn active" data-page="students-management">👨‍🎓 学生积分管理</button>
+            <button class="nav-btn" data-page="behavior-settings">📝 自定义行为设置</button>
+            <button class="nav-btn" data-page="rewards-management">🎁 兑换奖品管理</button>
+            <button class="nav-btn" data-page="points-log">📊 积分日志</button>
+        </div>
+        
+        <!-- 学生积分管理页面 -->
+        <div id="students-management" class="page active">
+            <div class="ribbon">
+                <h2>学生积分管理</h2>
+            </div>
+            <div id="students-grid" class="students-grid">
+                <!-- 学生卡片将通过JS动态生成 -->
+            </div>
+            
+            <div class="class-management">
+                <h3>班级管理操作</h3>
+                <div class="class-actions">
+                    <button id="add-student-btn" class="action-btn add-btn">➕ 添加新学生</button>
+                    <button id="add-all-points-btn" class="action-btn add-btn">📈 全班加分及原因</button>
+                    <button id="subtract-all-points-btn" class="action-btn subtract-btn">📉 全班减分及原因</button>
+                    <button id="import-data-btn" class="action-btn">📥 数据导入</button>
+                    <button id="export-data-btn" class="action-btn">📤 数据导出</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 自定义行为设置页面 -->
+        <div id="behavior-settings" class="page">
+            <div class="ribbon">
+                <h2>自定义行为设置</h2>
+            </div>
+            <div class="behavior-categories">
+                <!-- 行为分类将通过JS动态生成 -->
+            </div>
+            <div style="text-align: center; margin-top: 20px;">
+                <button id="add-behavior-pair-btn" class="action-btn add-btn">➕ 添加行为对</button>
+                <button id="batch-edit-behaviors-btn" class="action-btn">✏️ 批量编辑行为</button>
+            </div>
+        </div>
+        
+        <!-- 兑换奖品管理页面 -->
+        <div id="rewards-management" class="page">
+            <div class="ribbon">
+                <h2>兑换奖品管理</h2>
+            </div>
+            <div id="rewards-list" class="rewards-list">
+                <!-- 奖品将通过JS动态生成 -->
+            </div>
+            <div style="text-align: center; margin-top: 20px;">
+                <button id="add-reward-btn" class="action-btn add-btn">➕ 添加新奖品</button>
+            </div>
+        </div>
+        
+        <!-- 积分日志页面 -->
+        <div id="points-log" class="page">
+            <div class="ribbon">
+                <h2>积分日志</h2>
+            </div>
+            <div class="log-filters">
+                <input type="text" id="log-search" placeholder="🔍 搜索...">
+                <select id="log-type-filter">
+                    <option value="">所有类型</option>
+                    <option value="加分">加分</option>
+                    <option value="减分">减分</option>
+                    <option value="兑换">兑换</option>
+                </select>
+                <input type="date" id="log-date-filter">
+                <button id="clear-filters-btn" class="action-btn">清除筛选</button>
+            </div>
+            <table class="log-table">
+                <thead>
+                    <tr>
+                        <th data-sort="timestamp">时间</th>
+                        <th data-sort="studentId">学号</th>
+                        <th data-sort="studentName">姓名</th>
+                        <th data-sort="type">类型</th>
+                        <th data-sort="description">描述</th>
+                        <th data-sort="points">积分变化</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody id="log-table-body">
+                    <!-- 日志将通过JS动态生成 -->
+                </tbody>
+            </table>
+            <div id="log-summary" class="log-summary">
+                <!-- 日志汇总信息将通过JS动态生成 -->
+            </div>
+        </div>
+    </div>
+    
+    <!-- 模态框 -->
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modal-title">模态框标题</h3>
+                <button class="close-btn">&times;</button>
+            </div>
+            <div id="modal-body">
+                <!-- 模态框内容将通过JS动态生成 -->
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // 数据结构和初始数据
+        let data = {
+            students: [
+                { id: 1, name: "小明", points: 0 },
+                { id: 2, name: "小红", points: 0 }
+            ],
+            behaviors: {
+                "生活篇": [
+                    { id: 1, description: "帮助同学", points: 2 },
+                    { id: 2, description: "整理教室", points: 3 }
+                ],
+                "校园篇": [
+                    { id: 1, description: "参加活动", points: 5 },
+                    { id: 2, description: "迟到", points: -2 }
+                ],
+                "学习习惯篇": [
+                    { id: 1, description: "完成作业", points: 2 },
+                    { id: 2, description: "未交作业", points: -3 }
+                ],
+                "考试奖惩篇": [
+                    { id: 1, description: "考试优秀", points: 10 },
+                    { id: 2, description: "考试不及格", points: -5 }
+                ]
+            },
+            rewards: [
+                { id: 1, name: "铅笔", cost: 5 },
+                { id: 2, name: "橡皮", cost: 3 },
+                { id: 3, name: "笔记本", cost: 10 }
+            ],
+            logs: []
+        };
+
+        // 从LocalStorage加载数据
+        function loadData() {
+            const savedData = localStorage.getItem('classPointsSystem');
+            if (savedData) {
+                try {
+                    data = JSON.parse(savedData);
+                } catch (e) {
+                    console.error("解析保存的数据时出错:", e);
+                    // 使用默认数据
+                    localStorage.setItem('classPointsSystem', JSON.stringify(data));
+                }
+            } else {
+                // 初始化保存数据
+                localStorage.setItem('classPointsSystem', JSON.stringify(data));
+            }
+        }
+
+        // 保存数据到LocalStorage
+        function saveData() {
+            localStorage.setItem('classPointsSystem', JSON.stringify(data));
+        }
+
+        // 初始化页面
+        function init() {
+            loadData();
+            renderStudents();
+            renderBehaviorCategories();
+            renderRewards();
+            renderLogs();
+            setupEventListeners();
+        }
+
+        // 渲染学生卡片
+        function renderStudents() {
+            const studentsGrid = document.getElementById('students-grid');
+            studentsGrid.innerHTML = '';
+            
+            data.students.forEach(student => {
+                const card = document.createElement('div');
+                card.className = 'student-card';
+                card.innerHTML = `
+                    <button class="delete-btn" data-id="${student.id}">&times;</button>
+                    <h3 contenteditable="true" onblur="updateStudentName(${student.id}, this.textContent)">${student.name}</h3>
+                    <div>学号: <span contenteditable="true" onblur="updateStudentId(${student.id}, this.textContent)">${student.id}</span></div>
+                    <div class="points">${student.points} 积分</div>
+                    <div class="student-actions">
+                        <button class="action-btn add-btn" onclick="showAddPointsModal(${student.id})">➕ 加分</button>
+                        <button class="action-btn subtract-btn" onclick="showSubtractPointsModal(${student.id})">➖ 减分</button>
+                        <button class="action-btn exchange-btn" onclick="showExchangeModal(${student.id})">🎁 兑换</button>
+                    </div>
+                    <div class="behavior-search-container">
+                        <input type="text" class="behavior-search" placeholder="🔍 搜索行为..." 
+                               oninput="filterBehaviors(this, ${student.id})">
+                        <div class="search-results" id="search-results-${student.id}"></div>
+                    </div>
+                    <div>
+                        <select id="behavior-select-${student.id}" style="width:100%">
+                            <option value="">选择行为</option>
+                        </select>
+                        <button class="action-btn" onclick="applyBehavior(${student.id})">应用</button>
+                    </div>
+                `;
+                
+                // 填充行为选择下拉框
+                const select = card.querySelector(`#behavior-select-${student.id}`);
+                for (const category in data.behaviors) {
+                    const optgroup = document.createElement('optgroup');
+                    optgroup.label = category;
+                    
+                    data.behaviors[category].forEach(behavior => {
+                        const option = document.createElement('option');
+                        option.value = `${category}|${behavior.id}`;
+                        option.textContent = `${behavior.description} (${behavior.points > 0 ? '+' : ''}${behavior.points})`;
+                        optgroup.appendChild(option);
+                    });
+                    
+                    select.appendChild(optgroup);
+                }
+                
+                studentsGrid.appendChild(card);
+            });
+        }
+
+        // 过滤行为
+        function filterBehaviors(inputElement, studentId) {
+            const searchText = inputElement.value.toLowerCase();
+            const resultsContainer = document.getElementById(`search-results-${studentId}`);
+            resultsContainer.innerHTML = '';
+            
+            if (searchText.length < 1) {
+                resultsContainer.style.display = 'none';
+                return;
+            }
+            
+            const results = [];
+            
+            // 搜索所有行为
+            for (const category in data.behaviors) {
+                data.behaviors[category].forEach(behavior => {
+                    if (behavior.description.toLowerCase().includes(searchText)) {
+                        results.push({
+                            category,
+                            behavior,
+                            text: `${category}: ${behavior.description} (${behavior.points > 0 ? '+' : ''}${behavior.points})`
+                        });
+                    }
+                });
+            }
+            
+            // 显示搜索结果
+            if (results.length > 0) {
+                resultsContainer.style.display = 'block';
+                results.forEach(result => {
+                    const item = document.createElement('div');
+                    item.className = 'search-result-item';
+                    item.textContent = result.text;
+                    item.onclick = () => {
+                        document.getElementById(`behavior-select-${studentId}`).value = `${result.category}|${result.behavior.id}`;
+                        resultsContainer.style.display = 'none';
+                        inputElement.value = '';
+                        applyBehavior(studentId);
+                    };
+                    resultsContainer.appendChild(item);
+                });
+            } else {
+                resultsContainer.style.display = 'none';
+            }
+        }
+
+        // 渲染行为分类
+        function renderBehaviorCategories() {
+            const container = document.querySelector('.behavior-categories');
+            container.innerHTML = '';
+            
+            for (const category in data.behaviors) {
+                const categoryDiv = document.createElement('div');
+                categoryDiv.className = 'category';
+                categoryDiv.innerHTML = `<h3>${category}</h3>`;
+                
+                const list = document.createElement('ul');
+                list.className = 'behavior-list';
+                
+                data.behaviors[category].forEach(behavior => {
+                    const item = document.createElement('li');
+                    item.className = 'behavior-item';
+                    item.innerHTML = `
+                        <div class="behavior-number">${behavior.id}</div>
+                        <span class="behavior-description" contenteditable="true" onblur="updateBehaviorDescription('${category}', ${behavior.id}, this.textContent)">${behavior.description}</span>
+                        <span class="behavior-points" contenteditable="true" onblur="updateBehaviorPoints('${category}', ${behavior.id}, this.textContent)">${behavior.points > 0 ? '+' : ''}${behavior.points}</span>
+                        <button class="action-btn subtract-btn" onclick="deleteBehavior('${category}', ${behavior.id})">删除</button>
+                    `;
+                    list.appendChild(item);
+                });
+                
+                categoryDiv.appendChild(list);
+                categoryDiv.innerHTML += `<button class="action-btn add-btn" onclick="showAddBehaviorModal('${category}')">添加行为</button>`;
+                categoryDiv.innerHTML += `<button class="action-btn subtract-btn" onclick="deleteCategoryBehaviors('${category}')">批量删除</button>`;
+                
+                container.appendChild(categoryDiv);
+            }
+        }
+
+        // 渲染奖品列表
+        function renderRewards() {
+            const rewardsList = document.getElementById('rewards-list');
+            rewardsList.innerHTML = '';
+            
+            data.rewards.forEach(reward => {
+                const item = document.createElement('div');
+                item.className = 'reward-item';
+                item.innerHTML = `
+                    <h3 contenteditable="true" onblur="updateRewardName(${reward.id}, this.textContent)">${reward.name}</h3>
+                    <div class="reward-cost" contenteditable="true" onblur="updateRewardCost(${reward.id}, this.textContent)">${reward.cost} 积分</div>
+                    <button class="action-btn subtract-btn" onclick="deleteReward(${reward.id})">删除</button>
+                `;
+                rewardsList.appendChild(item);
+            });
+        }
+
+        // 渲染日志
+        function renderLogs() {
+            const logTableBody = document.getElementById('log-table-body');
+            logTableBody.innerHTML = '';
+            
+            // 应用筛选
+            const searchText = document.getElementById('log-search').value.toLowerCase();
+            const typeFilter = document.getElementById('log-type-filter').value;
+            const dateFilter = document.getElementById('log-date-filter').value;
+            
+            let filteredLogs = data.logs.filter(log => {
+                const matchesSearch = log.studentName.toLowerCase().includes(searchText) || 
+                                     log.description.toLowerCase().includes(searchText);
+                const matchesType = !typeFilter || log.type === typeFilter;
+                const matchesDate = !dateFilter || log.timestamp.startsWith(dateFilter);
+                
+                return matchesSearch && matchesType && matchesDate;
+            });
+            
+            // 排序 (简化实现)
+            const sortBy = document.querySelector('.log-table th[data-sort].sorted')?.dataset.sort || 'timestamp';
+            filteredLogs.sort((a, b) => {
+                if (a[sortBy] < b[sortBy]) return -1;
+                if (a[sortBy] > b[sortBy]) return 1;
+                return 0;
+            });
+            
+            // 计算汇总
+            let addPointsTotal = 0;
+            let subtractPointsTotal = 0;
+            let exchangePointsTotal = 0;
+            
+            // 渲染日志行
+            filteredLogs.forEach(log => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${log.timestamp}</td>
+                    <td>${log.studentId}</td>
+                    <td>${log.studentName}</td>
+                    <td>${log.type}</td>
+                    <td>${log.description}</td>
+                    <td>${log.points > 0 ? '+' : ''}${log.points}</td>
+                    <td><button class="action-btn subtract-btn" onclick="deleteLog('${log.timestamp}', ${log.studentId}, ${log.points}, '${log.type}')">删除</button></td>
+                `;
+                logTableBody.appendChild(row);
+                
+                // 计算汇总
+                if (log.type === '加分') {
+                    addPointsTotal += log.points;
+                } else if (log.type === '减分') {
+                    subtractPointsTotal += Math.abs(log.points);
+                } else if (log.type === '兑换') {
+                    exchangePointsTotal += Math.abs(log.points);
+                }
+            });
+            
+            // 显示汇总信息
+            const logSummary = document.getElementById('log-summary');
+            logSummary.innerHTML = `
+                <div>加分总计: ${addPointsTotal} | 减分总计: ${subtractPointsTotal} | 兑换总计: ${exchangePointsTotal}</div>
+            `;
+        }
+
+        // 删除日志记录
+        function deleteLog(timestamp, studentId, points, type) {
+            if (!confirm('确定要删除这条记录吗？此操作将影响学生的积分！')) {
+                return;
+            }
+            
+            // 找到要删除的日志索引
+            const logIndex = data.logs.findIndex(log => 
+                log.timestamp === timestamp && log.studentId === studentId && log.points === points && log.type === type
+            );
+            
+            if (logIndex === -1) {
+                alert('未找到要删除的记录');
+                return;
+            }
+            
+            // 更新学生积分
+            const student = data.students.find(s => s.id === studentId);
+            if (student) {
+                if (type === '加分') {
+                    student.points = Math.max(0, student.points - points);
+                } else if (type === '减分') {
+                    student.points += Math.abs(points);
+                } else if (type === '兑换') {
+                    student.points += Math.abs(points);
+                }
+            }
+            
+            // 删除日志
+            data.logs.splice(logIndex, 1);
+            
+            saveData();
+            renderStudents();
+            renderLogs();
+            alert('记录已删除，学生积分已调整');
+        }
+
+        // 设置事件监听器
+        function setupEventListeners() {
+            // 导航按钮
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+                    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+                    
+                    btn.classList.add('active');
+                    document.getElementById(btn.dataset.page).classList.add('active');
+                });
+            });
+            
+            // 关闭模态框
+            document.querySelector('.close-btn').addEventListener('click', hideModal);
+            
+            // 添加学生
+            document.getElementById('add-student-btn').addEventListener('click', showAddStudentModal);
+            
+            // 全班加减分
+            document.getElementById('add-all-points-btn').addEventListener('click', () => showBatchPointsModal(true));
+            document.getElementById('subtract-all-points-btn').addEventListener('click', () => showBatchPointsModal(false));
+            
+            // 数据导入导出
+            document.getElementById('import-data-btn').addEventListener('click', importData);
+            document.getElementById('export-data-btn').addEventListener('click', exportData);
+            
+            // 添加行为对
+            document.getElementById('add-behavior-pair-btn').addEventListener('click', showAddBehaviorPairModal);
+            
+            // 批量编辑行为
+            document.getElementById('batch-edit-behaviors-btn').addEventListener('click', showBatchEditBehaviorsModal);
+            
+            // 添加奖品
+            document.getElementById('add-reward-btn').addEventListener('click', showAddRewardModal);
+            
+            // 日志筛选
+            document.getElementById('log-search').addEventListener('input', renderLogs);
+            document.getElementById('log-type-filter').addEventListener('change', renderLogs);
+            document.getElementById('log-date-filter').addEventListener('change', renderLogs);
+            document.getElementById('clear-filters-btn').addEventListener('click', () => {
+                document.getElementById('log-search').value = '';
+                document.getElementById('log-type-filter').value = '';
+                document.getElementById('log-date-filter').value = '';
+                renderLogs();
+            });
+            
+            // 日志表头排序
+            document.querySelectorAll('.log-table th[data-sort]').forEach(th => {
+                th.addEventListener('click', () => {
+                    document.querySelectorAll('.log-table th[data-sort]').forEach(h => h.classList.remove('sorted'));
+                    th.classList.add('sorted');
+                    renderLogs();
+                });
+            });
+            
+            // 点击模态框外部关闭
+            document.getElementById('modal').addEventListener('click', (e) => {
+                if (e.target === document.getElementById('modal')) {
+                    hideModal();
+                }
+            });
+        }
+
+        // 显示模态框
+        function showModal(title, content) {
+            document.getElementById('modal-title').textContent = title;
+            document.getElementById('modal-body').innerHTML = content;
+            document.getElementById('modal').style.display = 'flex';
+        }
+
+        // 隐藏模态框
+        function hideModal() {
+            document.getElementById('modal').style.display = 'none';
+        }
+
+        // 显示添加学生模态框
+        function showAddStudentModal() {
+            const content = `
+                <div class="form-group">
+                    <label for="new-student-name">姓名:</label>
+                    <input type="text" id="new-student-name" required>
+                </div>
+                <div class="form-group">
+                    <label for="new-student-id">学号:</label>
+                    <input type="number" id="new-student-id" value="${data.students.length > 0 ? Math.max(...data.students.map(s => s.id)) + 1 : 1}" required>
+                </div>
+                <div class="modal-actions">
+                    <button class="action-btn" onclick="hideModal()">取消</button>
+                    <button class="action-btn add-btn" onclick="addStudent()">添加</button>
+                </div>
+            `;
+            showModal('添加新学生', content);
+        }
+
+        // 添加学生
+        function addStudent() {
+            const name = document.getElementById('new-student-name').value;
+            const id = parseInt(document.getElementById('new-student-id').value);
+            
+            if (!name || isNaN(id)) {
+                alert('请输入有效的姓名和学号');
+                return;
+            }
+            
+            if (data.students.some(s => s.id === id)) {
+                alert('该学号已存在');
+                return;
+            }
+            
+            data.students.push({ id, name, points: 0 });
+            saveData();
+            renderStudents();
+            hideModal();
+        }
+
+        // 更新学生姓名
+        function updateStudentName(studentId, newName) {
+            const student = data.students.find(s => s.id === studentId);
+            if (student && newName.trim()) {
+                student.name = newName.trim();
+                saveData();
+            } else {
+                renderStudents(); // 恢复原值
+            }
+        }
+
+        // 更新学生学号
+        function updateStudentId(oldId, newId) {
+            const newIdNum = parseInt(newId);
+            if (isNaN(newIdNum) || newIdNum < 1) {
+                alert('学号必须是正整数');
+                renderStudents();
+                return;
+            }
+            
+            if (data.students.some(s => s.id === newIdNum && s.id !== oldId)) {
+                alert('该学号已存在');
+                renderStudents();
+                return;
+            }
+            
+            const student = data.students.find(s => s.id === oldId);
+            if (student) {
+                // 更新日志中的学号
+                data.logs.forEach(log => {
+                    if (log.studentId === oldId) {
+                        log.studentId = newIdNum;
+                    }
+                });
+                
+                student.id = newIdNum;
+                saveData();
+            }
+        }
+
+        // 删除学生
+        function deleteStudent(studentId) {
+            if (confirm('确定要删除这个学生吗？')) {
+                data.students = data.students.filter(s => s.id !== studentId);
+                // 同时删除相关日志
+                data.logs = data.logs.filter(log => log.studentId !== studentId);
+                saveData();
+                renderStudents();
+                renderLogs();
+            }
+        }
+
+        // 显示加分模态框
+        function showAddPointsModal(studentId) {
+            const content = `
+                <div class="form-group">
+                    <label for="points-to-add">加分数量:</label>
+                    <input type="number" id="points-to-add" min="1" value="1" required>
+                </div>
+                <div class="form-group">
+                    <label for="add-reason">原因:</label>
+                    <input type="text" id="add-reason" required>
+                </div>
+                <div class="modal-actions">
+                    <button class="action-btn" onclick="hideModal()">取消</button>
+                    <button class="action-btn add-btn" onclick="addPoints(${studentId})">确定</button>
+                </div>
+            `;
+            showModal('为学生加分', content);
+        }
+
+        // 加分
+        function addPoints(studentId) {
+            const points = parseInt(document.getElementById('points-to-add').value);
+            const reason = document.getElementById('add-reason').value;
+            
+            if (isNaN(points) || points < 1 || !reason) {
+                alert('请输入有效的分数和原因');
+                return;
+            }
+            
+            const student = data.students.find(s => s.id === studentId);
+            if (student) {
+                student.points += points;
+                
+                // 记录日志
+                data.logs.push({
+                    timestamp: new Date().toLocaleString(),
+                    studentId: student.id,
+                    studentName: student.name,
+                    type: '加分',
+                    description: reason,
+                    points: points
+                });
+                
+                saveData();
+                renderStudents();
+                renderLogs();
+                hideModal();
+            }
+        }
+
+        // 显示减分模态框
+        function showSubtractPointsModal(studentId) {
+            const content = `
+                <div class="form-group">
+                    <label for="points-to-subtract">减分数量:</label>
+                    <input type="number" id="points-to-subtract" min="1" value="1" required>
+                </div>
+                <div class="form-group">
+                    <label for="subtract-reason">原因:</label>
+                    <input type="text" id="subtract-reason" required>
+                </div>
+                <div class="modal-actions">
+                    <button class="action-btn" onclick="hideModal()">取消</button>
+                    <button class="action-btn subtract-btn" onclick="subtractPoints(${studentId})">确定</button>
+                </div>
+            `;
+            showModal('为学生减分', content);
+        }
+
+        // 减分
+        function subtractPoints(studentId) {
+            const points = parseInt(document.getElementById('points-to-subtract').value);
+            const reason = document.getElementById('subtract-reason').value;
+            
+            if (isNaN(points) || points < 1 || !reason) {
+                alert('请输入有效的分数和原因');
+                return;
+            }
+            
+            const student = data.students.find(s => s.id === studentId);
+            if (student) {
+                student.points = Math.max(0, student.points - points);
+                
+                // 记录日志
+                data.logs.push({
+                    timestamp: new Date().toLocaleString(),
+                    studentId: student.id,
+                    studentName: student.name,
+                    type: '减分',
+                    description: reason,
+                    points: -points
+                });
+                
+                saveData();
+                renderStudents();
+                renderLogs();
+                hideModal();
+            }
+        }
+
+        // 显示兑换模态框
+        function showExchangeModal(studentId) {
+            const student = data.students.find(s => s.id === studentId);
+            if (!student) return;
+            
+            let options = '';
+            data.rewards.forEach(reward => {
+                if (student.points >= reward.cost) {
+                    options += `<option value="${reward.id}">${reward.name} (${reward.cost}积分)</option>`;
+                }
+            });
+            
+            if (!options) {
+                alert('没有可兑换的奖品或积分不足');
+                return;
+            }
+            
+            const content = `
+                <div class="form-group">
+                    <label for="reward-to-exchange">选择奖品:</label>
+                    <select id="reward-to-exchange" required>
+                        ${options}
+                    </select>
+                </div>
+                <div class="modal-actions">
+                    <button class="action-btn" onclick="hideModal()">取消</button>
+                    <button class="action-btn exchange-btn" onclick="exchangeReward(${studentId})">兑换</button>
+                </div>
+            `;
+            showModal('兑换奖品', content);
+        }
+
+        // 兑换奖品
+        function exchangeReward(studentId) {
+            const rewardId = parseInt(document.getElementById('reward-to-exchange').value);
+            const reward = data.rewards.find(r => r.id === rewardId);
+            const student = data.students.find(s => s.id === studentId);
+            
+            if (!reward || !student) return;
+            
+            if (student.points < reward.cost) {
+                alert('积分不足，无法兑换');
+                return;
+            }
+            
+            student.points -= reward.cost;
+            
+            // 记录日志
+            data.logs.push({
+                timestamp: new Date().toLocaleString(),
+                studentId: student.id,
+                studentName: student.name,
+                type: '兑换',
+                description: `兑换了${reward.name}`,
+                points: -reward.cost
+            });
+            
+            saveData();
+            renderStudents();
+            renderLogs();
+            hideModal();
+        }
+
+        // 应用行为
+        function applyBehavior(studentId) {
+            const select = document.getElementById(`behavior-select-${studentId}`);
+            const value = select.value;
+            
+            if (!value) return;
+            
+            const [category, behaviorId] = value.split('|');
+            const behavior = data.behaviors[category].find(b => b.id === parseInt(behaviorId));
+            const student = data.students.find(s => s.id === studentId);
+            
+            if (!behavior || !student) return;
+            
+            student.points = Math.max(0, student.points + behavior.points);
+            
+            // 记录日志
+            data.logs.push({
+                timestamp: new Date().toLocaleString(),
+                studentId: student.id,
+                studentName: student.name,
+                type: behavior.points > 0 ? '加分' : '减分',
+                description: behavior.description,
+                points: behavior.points
+            });
+            
+            saveData();
+            renderStudents();
+            renderLogs();
+            
+            // 重置选择
+            select.value = '';
+        }
+
+        // 显示全班加减分模态框
+        function showBatchPointsModal(isAdd) {
+            const content = `
+                <div class="form-group">
+                    <label for="batch-points">${isAdd ? '加分' : '减分'}数量:</label>
+                    <input type="number" id="batch-points" min="1" value="1" required>
+                </div>
+                <div class="form-group">
+                    <label for="batch-reason">原因:</label>
+                    <input type="text" id="batch-reason" required>
+                </div>
+                <div class="modal-actions">
+                    <button class="action-btn" onclick="hideModal()">取消</button>
+                    <button class="action-btn ${isAdd ? 'add-btn' : 'subtract-btn'}" onclick="batchPoints(${isAdd})">确定</button>
+                </div>
+            `;
+            showModal(isAdd ? '全班加分' : '全班减分', content);
+        }
+
+        // 全班加减分
+        function batchPoints(isAdd) {
+            const points = parseInt(document.getElementById('batch-points').value);
+            const reason = document.getElementById('batch-reason').value;
+            
+            if (isNaN(points) || points < 1 || !reason) {
+                alert('请输入有效的分数和原因');
+                return;
+            }
+            
+            const pointsChange = isAdd ? points : -points;
+            
+            data.students.forEach(student => {
+                student.points = Math.max(0, student.points + pointsChange);
+                
+                // 记录日志
+                data.logs.push({
+                    timestamp: new Date().toLocaleString(),
+                    studentId: student.id,
+                    studentName: student.name,
+                    type: isAdd ? '加分' : '减分',
+                    description: `全班${reason}`,
+                    points: pointsChange
+                });
+            });
+            
+            saveData();
+            renderStudents();
+            renderLogs();
+            hideModal();
+        }
+
+        // 显示添加行为模态框
+        function showAddBehaviorModal(category) {
+            const content = `
+                <div class="form-group">
+                    <label for="new-behavior-desc">行为描述:</label>
+                    <input type="text" id="new-behavior-desc" required>
+                </div>
+                <div class="form-group">
+                    <label for="new-behavior-points">积分变化:</label>
+                    <input type="number" id="new-behavior-points" required>
+                </div>
+                <div class="modal-actions">
+                    <button class="action-btn" onclick="hideModal()">取消</button>
+                    <button class="action-btn add-btn" onclick="addBehavior('${category}')">添加</button>
+                </div>
+            `;
+            showModal(`添加行为到${category}`, content);
+        }
+
+        // 添加行为
+        function addBehavior(category) {
+            const description = document.getElementById('new-behavior-desc').value;
+            const points = parseInt(document.getElementById('new-behavior-points').value);
+            
+            if (!description || isNaN(points)) {
+                alert('请输入有效的描述和分数');
+                return;
+            }
+            
+            // 生成新ID
+            const newId = data.behaviors[category].length > 0 ? 
+                Math.max(...data.behaviors[category].map(b => b.id)) + 1 : 1;
+            
+            data.behaviors[category].push({ id: newId, description, points });
+            saveData();
+            renderBehaviorCategories();
+            hideModal();
+        }
+
+        // 更新行为描述
+        function updateBehaviorDescription(category, behaviorId, newDescription) {
+            const behavior = data.behaviors[category].find(b => b.id === behaviorId);
+            if (behavior && newDescription.trim()) {
+                behavior.description = newDescription.trim();
+                saveData();
+            } else {
+                renderBehaviorCategories(); // 恢复原值
+            }
+        }
+
+        // 更新行为积分
+        function updateBehaviorPoints(category, behaviorId, newPoints) {
+            const points = parseInt(newPoints);
+            if (isNaN(points)) {
+                alert('积分必须是数字');
+                renderBehaviorCategories();
+                return;
+            }
+            
+            const behavior = data.behaviors[category].find(b => b.id === behaviorId);
+            if (behavior) {
+                behavior.points = points;
+                saveData();
+            }
+        }
+
+        // 删除行为
+        function deleteBehavior(category, behaviorId) {
+            if (confirm('确定要删除这个行为吗？')) {
+                data.behaviors[category] = data.behaviors[category].filter(b => b.id !== behaviorId);
+                // 重新排序行为ID
+                reorderBehaviorIds(category);
+                saveData();
+                renderBehaviorCategories();
+            }
+        }
+
+        // 重新排序行为ID
+        function reorderBehaviorIds(category) {
+            data.behaviors[category].forEach((behavior, index) => {
+                behavior.id = index + 1;
+            });
+        }
+
+        // 删除整个分类的行为
+        function deleteCategoryBehaviors(category) {
+            if (confirm(`确定要删除${category}的所有行为吗？`)) {
+                data.behaviors[category] = [];
+                saveData();
+                renderBehaviorCategories();
+            }
+        }
+
+        // 显示添加行为对模态框
+        function showAddBehaviorPairModal() {
+            const content = `
+                <div class="form-group">
+                    <label for="behavior-pair-category">选择分类:</label>
+                    <select id="behavior-pair-category">
+                        ${Object.keys(data.behaviors).map(cat => `<option value="${cat}">${cat}</option>`).join('')}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="positive-behavior">正向行为描述:</label>
+                    <input type="text" id="positive-behavior" required>
+                </div>
+                <div class="form-group">
+                    <label for="positive-points">正向积分:</label>
+                    <input type="number" id="positive-points" min="1" value="2" required>
+                </div>
+                <div class="form-group">
+                    <label for="negative-behavior">负向行为描述:</label>
+                    <input type="text" id="negative-behavior" required>
+                </div>
+                <div class="form-group">
+                    <label for="negative-points">负向积分:</label>
+                    <input type="number" id="negative-points" max="-1" value="-2" required>
+                </div>
+                <div class="modal-actions">
+                    <button class="action-btn" onclick="hideModal()">取消</button>
+                    <button class="action-btn add-btn" onclick="addBehaviorPair()">添加</button>
+                </div>
+            `;
+            showModal('添加行为对', content);
+        }
+
+        // 添加行为对
+        function addBehaviorPair() {
+            const category = document.getElementById('behavior-pair-category').value;
+            const positiveDesc = document.getElementById('positive-behavior').value;
+            const positivePoints = parseInt(document.getElementById('positive-points').value);
+            const negativeDesc = document.getElementById('negative-behavior').value;
+            const negativePoints = parseInt(document.getElementById('negative-points').value);
+            
+            if (!positiveDesc || !negativeDesc || isNaN(positivePoints) || isNaN(negativePoints) || positivePoints < 1 || negativePoints > -1) {
+                alert('请输入有效的描述和分数（正向分数必须为正，负向分数必须为负）');
+                return;
+            }
+            
+            // 生成新ID
+            const maxId = data.behaviors[category].length > 0 ? 
+                Math.max(...data.behaviors[category].map(b => b.id)) : 0;
+            
+            data.behaviors[category].push(
+                { id: maxId + 1, description: positiveDesc, points: positivePoints },
+                { id: maxId + 2, description: negativeDesc, points: negativePoints }
+            );
+            
+            saveData();
+            renderBehaviorCategories();
+            hideModal();
+        }
+
+        // 显示批量编辑行为模态框
+        function showBatchEditBehaviorsModal() {
+            let content = `
+                <div class="form-group">
+                    <label for="batch-edit-category">选择分类:</label>
+                    <select id="batch-edit-category">
+                        ${Object.keys(data.behaviors).map(cat => `<option value="${cat}">${cat}</option>`).join('')}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>批量编辑行为 (每行一个行为，格式: 描述,分数):</label>
+                    <textarea id="batch-behaviors" rows="10" style="width: 100%;"></textarea>
+                </div>
+                <div class="modal-actions">
+                    <button class="action-btn" onclick="hideModal()">取消</button>
+                    <button class="action-btn add-btn" onclick="applyBatchEditBehaviors()">应用</button>
+                </div>
+            `;
+            showModal('批量编辑行为', content);
+        }
+
+        // 应用批量编辑行为
+        function applyBatchEditBehaviors() {
+            const category = document.getElementById('batch-edit-category').value;
+            const text = document.getElementById('batch-behaviors').value;
+            
+            if (!text.trim()) {
+                alert('请输入行为数据');
+                return;
+            }
+            
+            const lines = text.split('\n');
+            const newBehaviors = [];
+            let nextId = 1;
+            
+            for (const line of lines) {
+                const [desc, pointsStr] = line.split(',');
+                if (!desc || !pointsStr) continue;
+                
+                const points = parseInt(pointsStr);
+                if (isNaN(points)) continue;
+                
+                newBehaviors.push({ id: nextId++, description: desc.trim(), points });
+            }
+            
+            if (newBehaviors.length === 0) {
+                alert('没有有效的行数据');
+                return;
+            }
+            
+            data.behaviors[category] = newBehaviors;
+            saveData();
+            renderBehaviorCategories();
+            hideModal();
+        }
+
+        // 显示添加奖品模态框
+        function showAddRewardModal() {
+            const content = `
+                <div class="form-group">
+                    <label for="new-reward-name">奖品名称:</label>
+                    <input type="text" id="new-reward-name" required>
+                </div>
+                <div class="form-group">
+                    <label for="new-reward-cost">所需积分:</label>
+                    <input type="number" id="new-reward-cost" min="1" value="5" required>
+                </div>
+                <div class="modal-actions">
+                    <button class="action-btn" onclick="hideModal()">取消</button>
+                    <button class="action-btn add-btn" onclick="addReward()">添加</button>
+                </div>
+            `;
+            showModal('添加新奖品', content);
+        }
+
+        // 添加奖品
+        function addReward() {
+            const name = document.getElementById('new-reward-name').value;
+            const cost = parseInt(document.getElementById('new-reward-cost').value);
+            
+            if (!name || isNaN(cost) || cost < 1) {
+                alert('请输入有效的名称和积分成本');
+                return;
+            }
+            
+            // 生成新ID
+            const newId = data.rewards.length > 0 ? 
+                Math.max(...data.rewards.map(r => r.id)) + 1 : 1;
+            
+            data.rewards.push({ id: newId, name, cost });
+            saveData();
+            renderRewards();
+            hideModal();
+        }
+
+        // 更新奖品名称
+        function updateRewardName(rewardId, newName) {
+            const reward = data.rewards.find(r => r.id === rewardId);
+            if (reward && newName.trim()) {
+                reward.name = newName.trim();
+                saveData();
+            } else {
+                renderRewards(); // 恢复原值
+            }
+        }
+
+        // 更新奖品成本
+        function updateRewardCost(rewardId, newCost) {
+            const cost = parseInt(newCost);
+            if (isNaN(cost) || cost < 1) {
+                alert('成本必须是正整数');
+                renderRewards();
+                return;
+            }
+            
+            const reward = data.rewards.find(r => r.id === rewardId);
+            if (reward) {
+                reward.cost = cost;
+                saveData();
+            }
+        }
+
+        // 删除奖品
+        function deleteReward(rewardId) {
+            if (confirm('确定要删除这个奖品吗？')) {
+                data.rewards = data.rewards.filter(r => r.id !== rewardId);
+                saveData();
+                renderRewards();
+            }
+        }
+
+        // 导出数据
+        function exportData() {
+            // 获取当前时间
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            
+            const filename = `积分榜数据_${year}-${month}-${day}_${hours}-${minutes}-${seconds}.xls`;
+            
+            // 创建表格内容
+            let tableContent = `
+                <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
+                <head>
+                    <meta charset="UTF-8">
+                    <!--[if gte mso 9]>
+                    <xml>
+                        <x:ExcelWorkbook>
+                            <x:ExcelWorksheets>
+                                <x:ExcelWorksheet>
+                                    <x:Name>学生积分</x:Name>
+                                    <x:WorksheetOptions>
+                                        <x:DisplayGridlines/>
+                                    </x:WorksheetOptions>
+                                </x:ExcelWorksheet>
+                            </x:ExcelWorksheets>
+                        </x:ExcelWorkbook>
+                    </xml>
+                    <![endif]-->
+                </head>
+                <body>
+                    <table>
+                        <tr>
+                            <th>学号</th>
+                            <th>姓名</th>
+                            <th>积分</th>
+                            <th>积分明细</th>
+                        </tr>
+            `;
+            
+            // 添加学生数据
+            data.students.forEach(student => {
+                // 获取该学生的所有日志
+                const studentLogs = data.logs.filter(log => log.studentId === student.id);
+                let details = '';
+                
+                studentLogs.forEach(log => {
+                    details += `${log.timestamp} [${log.type}] ${log.description}: ${log.points > 0 ? '+' : ''}${log.points}\\n`;
+                });
+                
+                tableContent += `
+                    <tr>
+                        <td>${student.id}</td>
+                        <td>${student.name}</td>
+                        <td>${student.points}</td>
+                        <td>${details}</td>
+                    </tr>
+                `;
+            });
+            
+            tableContent += `
+                    </table>
+                </body>
+                </html>
+            `;
+            
+            // 创建Blob和下载链接
+            const blob = new Blob([tableContent], { type: 'application/vnd.ms-excel;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            
+            link.setAttribute("href", url);
+            link.setAttribute("download", filename);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // 导入数据
+        function importData() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.xls,.xlsx,.csv';
+            
+            input.onchange = e => {
+                const file = e.target.files[0];
+                const reader = new FileReader();
+                
+                reader.onload = function(event) {
+                    // 简单提示，实际应用中需要解析Excel文件
+                    alert('Excel导入功能需要更复杂的实现。建议使用系统内的数据管理功能。');
+                };
+                
+                reader.readAsText(file);
+            };
+            
+            input.click();
+        }
+
+        // 初始化
+        window.onload = init;
+
+        // 为删除按钮添加事件委托
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('delete-btn') && e.target.dataset.id) {
+                deleteStudent(parseInt(e.target.dataset.id));
+            }
+        });
+
+        // 点击搜索区域外部时隐藏搜索结果
+        document.addEventListener('click', function(e) {
+            if (!e.target.classList.contains('behavior-search')) {
+                document.querySelectorAll('.search-results').forEach(container => {
+                    container.style.display = 'none';
+                });
+            }
+        });
+    </script>
+</body>
+</html>
